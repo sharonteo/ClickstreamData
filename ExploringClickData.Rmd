@@ -1,0 +1,68 @@
+---
+title: "Exploring Website Click Data"
+author: "Sharon Teo"
+date: "June 23, 2016"
+output: 
+  html_document:
+    keep_md: yes
+---
+
+# Getting the Data
+```{R}
+fileLocation <- "http://stat.columbia.edu/~rachel/datasets/nyt1.csv"
+data1 <- read.csv(url(fileLocation))
+```
+
+# Take a look at the first 5 rows
+```{R}
+head(data1)
+```
+# Overview of the structure of the data 
+```{R}
+str(data1)
+```
+# Task 1
+# Create a new variable ageGroup that categorizes age into following groups:        < 18, 18–24, 25–34, 35–44, 45–54, 55–64 and 65+.
+
+```{R}
+data1$Age_Group <- cut(data1$Age, c(-Inf, 18, 24, 34, 44, 54, 64, Inf))
+
+levels(data1$Age_Group) <- c("<18", "18-24", "25-34", "35-44", "45-54", "55-64", "65+")
+
+```
+
+# New age groups
+```{R}
+head(data1)
+```
+
+# Task 2
+# Plot distributions of number impressions and click-through-rate (CTR = click/impression) for the age groups.
+
+
+# Create a subset of data1 to exclude rows where there are no impressions (if there are no impressions, we assume there will be no clicks). Name the new object d1
+```{R}
+d1 <- subset(data1, Impressions>0)
+```
+# Add a column to d1 called CTR containing the click-through-rate
+```{R}
+d1$CTR <- d1$Clicks/d1$Impressions
+head(d1)
+```
+# Plot the distribution of Impressions>0, grouped by Age_Group, using the ggplot2   package
+
+```{R}
+library(ggplot2) # used for visualizations
+ggplot(subset(d1, Impressions>0), aes(x=Impressions, fill=Age_Group))+
+    geom_histogram(binwidth=1)
+```
+
+# Plot the distribution of CTR>0, grouped by Age_Group
+```{R}
+ggplot(subset(d1, CTR>0), aes(x=CTR, fill=Age_Group))+
+    labs(title="Click-through rate by age group (05/01/2012)")+
+    geom_histogram(binwidth=.025)
+```
+
+
+
